@@ -28,8 +28,16 @@ plugins {
     id 'idea'
 
     id 'org.openrewrite.rewrite' version '6.11.2'
-}
 
+    id 'java' //or 'java-library' - depending on your needs
+
+    id 'info.solidsoft.pitest' version '1.15.0'
+}
+pitest {
+    //adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
+    junit5PluginVersion = '1.0.0'    //or 0.15 for PIT <1.9.0
+    // ...
+}
 // Enable following for debugging
 // gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.
 

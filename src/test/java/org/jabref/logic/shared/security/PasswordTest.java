@@ -30,4 +30,6 @@ class PasswordTest {
 
         assertEquals(charEncryptedPassword, stringEncryptedPassword);
     }
+
+
 }
