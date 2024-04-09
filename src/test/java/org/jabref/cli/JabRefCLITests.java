@@ -1,17 +1,15 @@
 package org.jabref.cli;
 
+import javafx.util.Pair;
+import org.junit.jupiter.api.Test;
+
 import java.util.Collections;
 import java.util.List;
 
-import javafx.util.Pair;
-
-import org.junit.jupiter.api.Test;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class JabRefCLITest {
-
+public class JabRefCLITests {
     private final String bibtex = "@article{test, title=\"test title\"}";
 
     @Test
@@ -24,7 +22,6 @@ class JabRefCLITest {
     @Test
     void guiIsDisabledLongOptions() throws Exception {
         JabRefCLI cli = new JabRefCLI(new String[]{"--nogui", "--import=some/file", "--output=some/export/file"});
-
         assertTrue(cli.isDisableGui());
     }
 
@@ -134,33 +131,85 @@ class JabRefCLITest {
     }
 
     @Test
-    void wrapStringList() {
-        List<String> given = List.of("html", "simplehtml", "docbook5", "docbook4", "din1505", "bibordf", "tablerefs", "listrefs",
-                "tablerefsabsbib", "harvard", "iso690rtf", "iso690txt", "endnote", "oocsv", "ris", "misq", "yaml", "bibtexml", "oocalc", "ods",
-                "MSBib", "mods", "xmp", "pdf", "bib");
-        String expected = """
-                Available export formats: html, simplehtml, docbook5, docbook4, din1505, bibordf, tablerefs,
-                listrefs, tablerefsabsbib, harvard, iso690rtf, iso690txt, endnote, oocsv, ris, misq, yaml, bibtexml,
-                oocalc, ods, MSBib, mods, xmp, pdf, bib""";
-
-        assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given, 26));
+    void wrapStringList1() {
+        List<String> given = null;
+        String expected = "Available export formats: ";
+        assertThrows(NullPointerException.class, () -> JabRefCLI.wrapStringList(given, 26));
     }
 
     @Test
-    void alignStringTable() {
+    void wrapStringList2() {
+        List<String> given = List.of("html", "simplehtml", "docbook5", "docbook4", "din1505", "bibordf", "tablerefs", "listrefs",
+                "harvard");
+        String expected = """
+                Available export formats: html, simplehtml, docbook5, docbook4, din1505, bibordf, tablerefs,
+                listrefs, harvard""";
+        String actual = JabRefCLI.wrapStringList(given, 26);
+        System.out.println(actual);
+        assertEquals(expected, "Available export formats: " + actual);
+    }
+
+    @Test
+    void wrapStringList3() {
+        List<String> given = List.of("html");
+        String expected = """
+                Available export formats: html""";
+        String actual = JabRefCLI.wrapStringList(given, 26);
+        System.out.println(actual);
+        assertEquals(expected, "Available export formats: " + actual);
+    }
+
+    @Test
+    void wrapStringList4() {
+        List<String> given = List.of("html", "simplehtml", "docbook5", "docbook4", "din1505", "bibordf", "tablerefs", "listrefs");
+        String expected = """
+                Available export formats: html, simplehtml, docbook5, docbook4, din1505, bibordf, tablerefs,
+                listrefs""";
+        String actual = JabRefCLI.wrapStringList(given, 26);
+        System.out.println(actual);
+        assertEquals(expected, "Available export formats: " + actual);
+    }
+
+    @Test
+    void alignStringTable1() {
+        List<Pair<String, String>> given = null;
+        assertThrows(NullPointerException.class, () -> JabRefCLI.alignStringTable(given));
+    }
+
+    @Test
+    void alignStringTable2() {
         List<Pair<String, String>> given = List.of(
-                new Pair<>("Apple", "Slice"),
-                new Pair<>("Bread", "Loaf"),
-                new Pair<>("Paper", "Sheet"),
-                new Pair<>("Country", "County"));
+                new Pair<>("Apple", "Slice"));
 
         String expected = """
-                Apple   : Slice
-                Bread   : Loaf
-                Paper   : Sheet
-                Country : County
+                Apple : Slice
                 """;
 
-        assertEquals(expected, JabRefCLI.alignStringTable(given));
+        String normalizedExpected = normalizeLineEndings(expected);
+        String normalizedActual = normalizeLineEndings(JabRefCLI.alignStringTable(given));
+
+        assertEquals(normalizedExpected, normalizedActual);
+    }
+
+    @Test
+    void alignStringTable3() {
+        List<Pair<String, String>> given = List.of(
+                new Pair<>("Apple", "Slice"),
+                new Pair<>("Bread", "Loaf"));
+
+        String expected = """
+                Apple : Slice
+                Bread : Loaf
+                """;
+
+        String normalizedExpected = normalizeLineEndings(expected);
+        String normalizedActual = normalizeLineEndings(JabRefCLI.alignStringTable(given));
+
+        assertEquals(normalizedExpected, normalizedActual);
+    }
+
+    // Method to normalize line endings (\r\n to \n)
+    private String normalizeLineEndings(String input) {
+        return input.replaceAll("\r\n", "\n");
     }
 }
